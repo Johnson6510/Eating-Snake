@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13771" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13772"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--View Controller-->
+        <scene sceneID="tne-QT-ifu">
+            <objects>
+                <viewController id="BYZ-38-t0r" customClass="ViewController" customModule="Eating_Snake" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="gVG-54-xuc">
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                <state key="normal" title="START GAME"/>
+                                <connections>
+                                    <segue destination="vRt-8C-cld" kind="show" id="rJ7-04-lFC"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="gVG-54-xuc" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="5ep-1j-tGA"/>
+                            <constraint firstItem="gVG-54-xuc" firstAttribute="bottom" secondItem="6Tk-OE-BBY" secondAttribute="bottom" id="Uw9-1O-dl8"/>
+                            <constraint firstItem="gVG-54-xuc" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" id="fsi-Vf-1Nw"/>
+                            <constraint firstItem="gVG-54-xuc" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="kBZ-0A-LjQ"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="32.799999999999997" y="33.733133433283363"/>
+        </scene>
+        <!--Eating Snake-->
+        <scene sceneID="6yC-Fu-a7b">
+            <objects>
+                <viewController id="vRt-8C-cld" customClass="EatingSnake" customModule="Eating_Snake" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="61o-5r-DXj">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="a7k-6s-93H">
+                                <rect key="frame" x="36" y="185" width="300" height="300"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="300" id="HpL-nu-vmn"/>
+                                    <constraint firstAttribute="height" constant="300" id="Mux-Sg-C8h"/>
+                                </constraints>
+                            </view>
+                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="QhG-L0-dNb">
+                                <rect key="frame" x="0.0" y="20" width="375" height="44"/>
+                                <items>
+                                    <barButtonItem title="暫停" id="j1g-2E-5y9">
+                                        <connections>
+                                            <action selector="btnPause:" destination="vRt-8C-cld" id="gnB-Cc-tNU"/>
+                                        </connections>
+                                    </barButtonItem>
+                                </items>
+                            </toolbar>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="kuZ-Rx-wNN">
+                                <rect key="frame" x="165" y="32" width="42" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                        <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="hLD-Xp-lkq" firstAttribute="trailing" secondItem="kuZ-Rx-wNN" secondAttribute="trailing" constant="168" id="3D5-6u-OAl"/>
+                            <constraint firstItem="QhG-L0-dNb" firstAttribute="top" secondItem="61o-5r-DXj" secondAttribute="top" constant="20" id="7zD-4x-DWf"/>
+                            <constraint firstItem="a7k-6s-93H" firstAttribute="leading" secondItem="hLD-Xp-lkq" secondAttribute="leading" constant="36" id="L3T-VM-dkT"/>
+                            <constraint firstItem="kuZ-Rx-wNN" firstAttribute="top" secondItem="hLD-Xp-lkq" secondAttribute="top" constant="12" id="NEL-ZD-LxK"/>
+                            <constraint firstItem="QhG-L0-dNb" firstAttribute="leading" secondItem="61o-5r-DXj" secondAttribute="leading" id="aNG-Ke-taF"/>
+                            <constraint firstItem="hLD-Xp-lkq" firstAttribute="trailing" secondItem="QhG-L0-dNb" secondAttribute="trailing" id="at5-RW-BSs"/>
+                            <constraint firstItem="hLD-Xp-lkq" firstAttribute="bottom" secondItem="a7k-6s-93H" secondAttribute="bottom" constant="182" id="i2r-yP-meZ"/>
+                            <constraint firstItem="hLD-Xp-lkq" firstAttribute="trailing" secondItem="a7k-6s-93H" secondAttribute="trailing" constant="39" id="jTz-tp-GJG"/>
+                            <constraint firstItem="kuZ-Rx-wNN" firstAttribute="leading" secondItem="hLD-Xp-lkq" secondAttribute="leading" constant="165" id="liy-ar-6u4"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="hLD-Xp-lkq"/>
+                    </view>
+                    <connections>
+                        <outlet property="scoreLabel" destination="kuZ-Rx-wNN" id="0fk-Yh-34W"/>
+                        <outlet property="snakeView" destination="a7k-6s-93H" id="Xwp-gv-HwM"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="kkg-Kk-OWL" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <swipeGestureRecognizer direction="right" id="xE5-71-ymh"/>
+            </objects>
+            <point key="canvasLocation" x="782" y="34"/>
+        </scene>
+    </scenes>
+</document>
