@@ -333,6 +333,16 @@ class EatingSnake: UIViewController {
             snakeArray.removeLast()
         } else {
             isRemoveTail = true
+        }
+    
+        //check and generate food
+        var hadFood: Bool = false
+        for i in 0...14 {
+            if pixelValue[i].contains(where: { $0 == itemValue.food.rawValue }) {
+                hadFood = true
+            }
+        }
+        if !hadFood {
             addFood()
         }
     }
