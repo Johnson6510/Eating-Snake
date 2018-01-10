@@ -122,8 +122,7 @@ class EatingSnake: UIViewController {
         setupSwipeControls()
         scoreLabel.text = "Score: " + String(score) + ", Lv: " + String(level)
         pixelInit()
-        timeInterval = 0.5 - Double(level-1)*0.1
-        timer = Timer.scheduledTimer(timeInterval: timeInterval, target: self, selector: #selector(EatingSnake.snakeWalk), userInfo: nil, repeats: true)
+        setTimer(level: level)
     }
 
     override func didReceiveMemoryWarning() {
@@ -141,6 +140,12 @@ class EatingSnake: UIViewController {
         // Pass the selected object to the new view controller.
     }
     */
+    
+    func setTimer(level: Int) {
+        timer.invalidate()
+        timeInterval = 0.5 - Double(level - 1) * 0.005
+        timer = Timer.scheduledTimer(timeInterval: timeInterval, target: self, selector: #selector(EatingSnake.snakeWalk), userInfo: nil, repeats: true)
+    }
     
     var direction = moveDirection.left
     enum moveDirection {
@@ -317,10 +322,7 @@ class EatingSnake: UIViewController {
             level += 1
             scoreLabel.text = "Score: " + String(score) + ", Lv: " + String(level)
             isRemoveTail = false
-            timer.invalidate()
-            timeInterval = 0.5 - Double(level-1)*0.01
-            timer = Timer.scheduledTimer(timeInterval: timeInterval, target: self, selector: #selector(EatingSnake.snakeWalk), userInfo: nil, repeats: true)
-
+            setTimer(level: level)
         //eat body (die...)
         } else if pixelValue[headNew.x][headNew.y] == itemValue.snakeBody.rawValue || pixelValue[headNew.x][headNew.y] == itemValue.snakeTail.rawValue {
             print("eat body")
@@ -361,9 +363,7 @@ class EatingSnake: UIViewController {
         scoreLabel.text = "Score: " + String(score) + ", Lv: " + String(level)
         pixelReset()
         direction = moveDirection.left
-        timer.invalidate()
-        timeInterval = 0.5 - Double(level-1)*0.01
-        timer = Timer.scheduledTimer(timeInterval: timeInterval, target: self, selector: #selector(EatingSnake.snakeWalk), userInfo: nil, repeats: true)
+        setTimer(level: level)
     }
 
     
