@@ -67,8 +67,9 @@
                                     </barButtonItem>
                                 </items>
                             </toolbar>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="kuZ-Rx-wNN">
-                                <rect key="frame" x="165" y="32" width="42" height="21"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Label" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="kuZ-Rx-wNN">
+                                <rect key="frame" x="86" y="32" width="200" height="21"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
@@ -76,15 +77,12 @@
                         </subviews>
                         <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
                         <constraints>
-                            <constraint firstItem="hLD-Xp-lkq" firstAttribute="trailing" secondItem="kuZ-Rx-wNN" secondAttribute="trailing" constant="168" id="3D5-6u-OAl"/>
                             <constraint firstItem="QhG-L0-dNb" firstAttribute="top" secondItem="61o-5r-DXj" secondAttribute="top" constant="20" id="7zD-4x-DWf"/>
                             <constraint firstItem="a7k-6s-93H" firstAttribute="leading" secondItem="hLD-Xp-lkq" secondAttribute="leading" constant="36" id="L3T-VM-dkT"/>
-                            <constraint firstItem="kuZ-Rx-wNN" firstAttribute="top" secondItem="hLD-Xp-lkq" secondAttribute="top" constant="12" id="NEL-ZD-LxK"/>
                             <constraint firstItem="QhG-L0-dNb" firstAttribute="leading" secondItem="61o-5r-DXj" secondAttribute="leading" id="aNG-Ke-taF"/>
                             <constraint firstItem="hLD-Xp-lkq" firstAttribute="trailing" secondItem="QhG-L0-dNb" secondAttribute="trailing" id="at5-RW-BSs"/>
                             <constraint firstItem="hLD-Xp-lkq" firstAttribute="bottom" secondItem="a7k-6s-93H" secondAttribute="bottom" constant="182" id="i2r-yP-meZ"/>
                             <constraint firstItem="hLD-Xp-lkq" firstAttribute="trailing" secondItem="a7k-6s-93H" secondAttribute="trailing" constant="39" id="jTz-tp-GJG"/>
-                            <constraint firstItem="kuZ-Rx-wNN" firstAttribute="leading" secondItem="hLD-Xp-lkq" secondAttribute="leading" constant="165" id="liy-ar-6u4"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="hLD-Xp-lkq"/>
                     </view>

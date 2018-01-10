@@ -26,6 +26,8 @@ class EatingSnake: UIViewController {
     var snakeArray = [location()]
 
     var score = 0
+    var level = 1
+    var timeInterval: Double = 0.0
     @IBOutlet weak var scoreLabel: UILabel!
 
     @IBOutlet weak var snakeView: UIView!
@@ -118,9 +120,10 @@ class EatingSnake: UIViewController {
 
         // Do any additional setup after loading the view.
         setupSwipeControls()
-        scoreLabel.text = String(score)
+        scoreLabel.text = "Score: " + String(score) + ", Lv: " + String(level)
         pixelInit()
-        timer = Timer.scheduledTimer(timeInterval: 0.5, target: self, selector: #selector(EatingSnake.snakeWalk), userInfo: nil, repeats: true)
+        timeInterval = 0.5 - Double(level-1)*0.1
+        timer = Timer.scheduledTimer(timeInterval: timeInterval, target: self, selector: #selector(EatingSnake.snakeWalk), userInfo: nil, repeats: true)
     }
 
     override func didReceiveMemoryWarning() {
@@ -311,8 +314,13 @@ class EatingSnake: UIViewController {
         if pixelValue[headNew.x][headNew.y] == itemValue.food.rawValue {
             print("eat food")
             score += 10
-            scoreLabel.text = String(score)
+            level += 1
+            scoreLabel.text = "Score: " + String(score) + ", Lv: " + String(level)
             isRemoveTail = false
+            timer.invalidate()
+            timeInterval = 0.5 - Double(level-1)*0.01
+            timer = Timer.scheduledTimer(timeInterval: timeInterval, target: self, selector: #selector(EatingSnake.snakeWalk), userInfo: nil, repeats: true)
+
         //eat body (die...)
         } else if pixelValue[headNew.x][headNew.y] == itemValue.snakeBody.rawValue || pixelValue[headNew.x][headNew.y] == itemValue.snakeTail.rawValue {
             print("eat body")
@@ -349,11 +357,13 @@ class EatingSnake: UIViewController {
     
     func reStartGame() {
         score = 0
-        timer.fireDate = NSDate.distantPast
-        scoreLabel.text = String(score)
+        level = 1
+        scoreLabel.text = "Score: " + String(score) + ", Lv: " + String(level)
         pixelReset()
         direction = moveDirection.left
-
+        timer.invalidate()
+        timeInterval = 0.5 - Double(level-1)*0.01
+        timer = Timer.scheduledTimer(timeInterval: timeInterval, target: self, selector: #selector(EatingSnake.snakeWalk), userInfo: nil, repeats: true)
     }
 
     
