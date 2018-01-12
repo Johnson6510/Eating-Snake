@@ -7,9 +7,13 @@
 //
 
 import UIKit
+import AVFoundation
 
 class EatingSnake: UIViewController {
-    
+
+    var voiceEat :AVAudioPlayer! = nil
+    var voiceDie :AVAudioPlayer! = nil
+
     struct location {
         var x: Int = 0
         var y: Int = 0
@@ -119,6 +123,24 @@ class EatingSnake: UIViewController {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
+        //setup voice - eat
+        let soundPath1 = Bundle.main.path(forResource: "eat", ofType: "mp3")
+        do {
+            voiceEat = try AVAudioPlayer(contentsOf: NSURL.fileURL(withPath: soundPath1!))
+            voiceEat.numberOfLoops = 0 // 重複播放次數 設為 0 則是只播放一次 不重複
+        } catch {
+            print("error")
+        }
+
+        let soundPath2 = Bundle.main.path(forResource: "woman-die", ofType: "mp3")
+        do {
+            voiceDie = try AVAudioPlayer(contentsOf: NSURL.fileURL(withPath: soundPath2!))
+            voiceDie.numberOfLoops = 0 // 重複播放次數 設為 0 則是只播放一次 不重複
+        } catch {
+            print("error")
+        }
+
+        
         setupSwipeControls()
         scoreLabel.text = "Score: " + String(score) + ", Lv: " + String(level)
         pixelInit()
@@ -361,6 +383,7 @@ class EatingSnake: UIViewController {
         //judegement head eat food or body
         if pixelValue[headNew.x][headNew.y] == itemValue.food.rawValue {
             //eat food (head = food)
+            voiceEat.play()
             print("eat food")
             score += 10
             level += 1
@@ -369,6 +392,7 @@ class EatingSnake: UIViewController {
             setTimer(level: level)
         } else if Int(pixelValue[headNew.x][headNew.y]/10) == itemValue.snakeBody.rawValue/10 || Int(pixelValue[headNew.x][headNew.y]/10) == itemValue.snakeTail.rawValue/10 {
             //eat body (die...)
+            voiceDie.play()
             print("eat body")
             timer.fireDate = NSDate.distantFuture
             reStartAlarm()
