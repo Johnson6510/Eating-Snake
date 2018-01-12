@@ -161,9 +161,17 @@ class EatingSnake: UIViewController {
         case snakeHeadDown = "snakeHeadDown"
         case snakeHeadRight = "snakeHeadRight"
         case snakeBodyUp = "snakeBodyUp"
+        case snakeBodyUpLeft = "snakeBodyUpLeft"
+        case snakeBodyUpRight = "snakeBodyUpRight"
         case snakeBodyLeft = "snakeBodyLeft"
+        case snakeBodyLeftUp = "snakeBodyLeftUp"
+        case snakeBodyLeftDown = "snakeBodyLeftDown"
         case snakeBodyDown = "snakeBodyDown"
+        case snakeBodyDownLeft = "snakeBodyDownLeft"
+        case snakeBodyDownRight = "snakeBodyDownRight"
         case snakeBodyRight = "snakeBodyRight"
+        case snakeBodyRightUp = "snakeBodyRightUp"
+        case snakeBodyRightDown = "snakeBodyRightDown"
         case snakeTailUp = "snakeTailUp"
         case snakeTailLeft = "snakeTailLeft"
         case snakeTailDown = "snakeTailDown"
@@ -337,22 +345,6 @@ class EatingSnake: UIViewController {
     func snakeBodyMove(headOrg: (x: Int, y: Int), headNew: (x: Int, y: Int), tailOrg:  (x: Int, y: Int), tailNew:  (x: Int, y: Int)) {
         var isRemoveTail: Bool = true
         
-        //judegement head eat food or body
-        //eat food (head = food)
-        if pixelValue[headNew.x][headNew.y] == itemValue.food.rawValue {
-            print("eat food")
-            score += 10
-            level += 1
-            scoreLabel.text = "Score: " + String(score) + ", Lv: " + String(level)
-            isRemoveTail = false
-            setTimer(level: level)
-        //eat body (die...)
-        } else if pixelValue[headNew.x][headNew.y] == Int(itemValue.snakeBody.rawValue/10)*10 || Int(pixelValue[headNew.x][headNew.y]/10)*10 == itemValue.snakeTail.rawValue {
-            print("eat body")
-            timer.fireDate = NSDate.distantFuture
-            reStartAlarm()
-        }
-
         //head move
         switch direction.rawValue {
         case moveDirection.up.rawValue:
@@ -366,23 +358,62 @@ class EatingSnake: UIViewController {
         default:
             pixel[headNew.x][headNew.y].image(name: item.snakeHeadUp.rawValue)
         }
+        //judegement head eat food or body
+        if pixelValue[headNew.x][headNew.y] == itemValue.food.rawValue {
+            //eat food (head = food)
+            print("eat food")
+            score += 10
+            level += 1
+            scoreLabel.text = "Score: " + String(score) + ", Lv: " + String(level)
+            isRemoveTail = false
+            setTimer(level: level)
+        } else if Int(pixelValue[headNew.x][headNew.y]/10) == itemValue.snakeBody.rawValue/10 || Int(pixelValue[headNew.x][headNew.y]/10) == itemValue.snakeTail.rawValue/10 {
+            //eat body (die...)
+            print("eat body")
+            timer.fireDate = NSDate.distantFuture
+            reStartAlarm()
+        }
         pixelValue[headNew.x][headNew.y] = itemValue.snakeHead.rawValue + direction.rawValue
         snakeArray.insert(.init(x: headNew.x, y: headNew.y), at: 0)
 
         //Body move
         switch pixelValue[headOrg.x][headOrg.y]%10 {
         case moveDirection.up.rawValue:
-            pixel[headOrg.x][headOrg.y].image(name: item.snakeBodyUp.rawValue)
+            if direction == moveDirection.up {
+                pixel[headOrg.x][headOrg.y].image(name: item.snakeBodyUp.rawValue)
+            } else if direction == moveDirection.left {
+                pixel[headOrg.x][headOrg.y].image(name: item.snakeBodyUpLeft.rawValue)
+            } else if direction == moveDirection.right {
+                pixel[headOrg.x][headOrg.y].image(name: item.snakeBodyUpRight.rawValue)
+            }
         case moveDirection.left.rawValue:
-            pixel[headOrg.x][headOrg.y].image(name: item.snakeBodyLeft.rawValue)
+            if direction == moveDirection.left {
+                pixel[headOrg.x][headOrg.y].image(name: item.snakeBodyLeft.rawValue)
+            } else if direction == moveDirection.up {
+                pixel[headOrg.x][headOrg.y].image(name: item.snakeBodyLeftUp.rawValue)
+            } else if direction == moveDirection.down {
+                pixel[headOrg.x][headOrg.y].image(name: item.snakeBodyLeftDown.rawValue)
+            }
         case moveDirection.down.rawValue:
-            pixel[headOrg.x][headOrg.y].image(name: item.snakeBodyDown.rawValue)
+            if direction == moveDirection.down {
+                pixel[headOrg.x][headOrg.y].image(name: item.snakeBodyDown.rawValue)
+            } else if direction == moveDirection.left {
+                pixel[headOrg.x][headOrg.y].image(name: item.snakeBodyDownLeft.rawValue)
+            } else if direction == moveDirection.right {
+                pixel[headOrg.x][headOrg.y].image(name: item.snakeBodyDownRight.rawValue)
+            }
         case moveDirection.right.rawValue:
-            pixel[headOrg.x][headOrg.y].image(name: item.snakeBodyRight.rawValue)
+            if direction == moveDirection.right {
+                pixel[headOrg.x][headOrg.y].image(name: item.snakeBodyRight.rawValue)
+            } else if direction == moveDirection.up {
+                pixel[headOrg.x][headOrg.y].image(name: item.snakeBodyRightUp.rawValue)
+            } else if direction == moveDirection.down {
+                pixel[headOrg.x][headOrg.y].image(name: item.snakeBodyRightDown.rawValue)
+            }
         default:
             pixel[headOrg.x][headOrg.y].image(name: item.snakeBodyUp.rawValue)
         }
-        pixelValue[headOrg.x][headOrg.y] = itemValue.snakeBody.rawValue + pixelValue[headOrg.x][headOrg.y]%10
+        pixelValue[headOrg.x][headOrg.y] = itemValue.snakeBody.rawValue + direction.rawValue
 
         //tail move
         if isRemoveTail {
