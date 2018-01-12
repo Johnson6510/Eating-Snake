@@ -28,6 +28,7 @@ class EatingSnake: UIViewController {
     var pixel = [[UILabel]]()
     var pixelValue = [[Int]]()
     var snakeArray = [location()]
+    var isSnakeMove: Bool = true
 
     var score = 0
     var level = 1
@@ -91,7 +92,10 @@ class EatingSnake: UIViewController {
     func upCommand(_ r: UIGestureRecognizer!) {
         print("Swipe - Up")
         if direction == moveDirection.left || direction == moveDirection.right {
-            direction = moveDirection.up
+            if isSnakeMove {
+                direction = moveDirection.up
+                isSnakeMove = false
+            }
         }
     }
     
@@ -99,7 +103,10 @@ class EatingSnake: UIViewController {
     func downCommand(_ r: UIGestureRecognizer!) {
         print("Swipe - Down")
         if direction == moveDirection.left || direction == moveDirection.right {
-            direction = moveDirection.down
+            if isSnakeMove {
+                direction = moveDirection.down
+                isSnakeMove = false
+            }
         }
     }
     
@@ -107,7 +114,10 @@ class EatingSnake: UIViewController {
     func leftCommand(_ r: UIGestureRecognizer!) {
         print("Swipe - Left")
         if direction == moveDirection.up || direction == moveDirection.down {
-            direction = moveDirection.left
+            if isSnakeMove {
+                direction = moveDirection.left
+                isSnakeMove = false
+            }
         }
     }
     
@@ -115,7 +125,10 @@ class EatingSnake: UIViewController {
     func rightCommand(_ r: UIGestureRecognizer!) {
         print("Swipe - Right")
         if direction == moveDirection.up || direction == moveDirection.down {
-            direction = moveDirection.right
+            if isSnakeMove {
+                direction = moveDirection.right
+                isSnakeMove = false
+            }
         }
     }
 
@@ -362,6 +375,7 @@ class EatingSnake: UIViewController {
             let tailNewY = snakeArray[snakeArray.count-2].y
             snakeBodyMove(headOrg: (headOrgX, headOrgY), headNew: (headNewX, headNewY), tailOrg: (tailOrgX, tailOrgY), tailNew: (tailNewX, tailNewY))
         }
+        isSnakeMove = true
     }
     
     func snakeBodyMove(headOrg: (x: Int, y: Int), headNew: (x: Int, y: Int), tailOrg:  (x: Int, y: Int), tailNew:  (x: Int, y: Int)) {
