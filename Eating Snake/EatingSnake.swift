@@ -148,27 +148,51 @@ class EatingSnake: UIViewController {
     }
     
     var direction = moveDirection.left
-    enum moveDirection {
-        case up
-        case down
-        case left
-        case right
+    enum moveDirection: Int {
+        case up = 1
+        case left = 2
+        case down = 3
+        case right = 4
     }
 
     enum item: String {
-        case snakeHead = "🐸"
-        case snakeBody = "🎾"
-        case snakeTail = "🎄"
+        case snakeHeadUp = "snakeHeadUp"
+        case snakeHeadLeft = "snakeHeadLeft"
+        case snakeHeadDown = "snakeHeadDown"
+        case snakeHeadRight = "snakeHeadRight"
+        case snakeBodyUp = "snakeBodyUp"
+        case snakeBodyLeft = "snakeBodyLeft"
+        case snakeBodyDown = "snakeBodyDown"
+        case snakeBodyRight = "snakeBodyRight"
+        case snakeTailUp = "snakeTailUp"
+        case snakeTailLeft = "snakeTailLeft"
+        case snakeTailDown = "snakeTailDown"
+        case snakeTailRight = "snakeTailRight"
         case food = "🍖"
-        case none = ""
+        case none = " "
     }
     
+    //10位數 = 蛇的部位，個位數 = 方向
     enum itemValue: Int {
-        case snakeHead = 5
-        case snakeBody = 4
-        case snakeTail = 3
-        case food = 1
+        case snakeHead = 50
+        case snakeBody = 40
+        case snakeTail = 30
+
+        case food = 99
         case none = 0
+
+        case snakeHeadUp = 51
+        case snakeHeadLeft = 52
+        case snakeHeadDown = 53
+        case snakeHeadRight = 54
+        case snakeBodyUp = 41
+        case snakeBodyLeft = 42
+        case snakeBodyDown = 43
+        case snakeBodyRight = 44
+        case snakeTailUp = 31
+        case snakeTailLeft = 32
+        case snakeTailDown = 33
+        case snakeTailRight = 34
     }
     
     func pixelInit() {
@@ -187,13 +211,13 @@ class EatingSnake: UIViewController {
         snakeArray.removeAll()
         
         //snake head defined
-        pixel[7][7].text = item.snakeHead.rawValue
-        pixelValue[7][7] = itemValue.snakeHead.rawValue
+        pixel[7][7].image(name: item.snakeHeadLeft.rawValue)
+        pixelValue[7][7] = itemValue.snakeHead.rawValue + moveDirection.left.rawValue
         snakeArray.append(.init(x: 7, y: 7))
 
         //snake tail defined
-        pixel[8][7].text = item.snakeTail.rawValue
-        pixelValue[8][7] = itemValue.snakeTail.rawValue
+        pixel[8][7].image(name: item.snakeTailLeft.rawValue)
+        pixelValue[8][7] = itemValue.snakeTail.rawValue + moveDirection.left.rawValue
         snakeArray.append(.init(x: 8, y: 7))
 
         //food defined
@@ -211,13 +235,13 @@ class EatingSnake: UIViewController {
         snakeArray.removeAll()
         
         //snake head defined
-        pixel[7][7].text = item.snakeHead.rawValue
-        pixelValue[7][7] = itemValue.snakeHead.rawValue
+        pixel[7][7].image(name: item.snakeBodyLeft.rawValue)
+        pixelValue[7][7] = itemValue.snakeHead.rawValue + moveDirection.left.rawValue
         snakeArray.append(.init(x: 7, y: 7))
         
         //snake tail defined
-        pixel[8][7].text = item.snakeTail.rawValue
-        pixelValue[8][7] = itemValue.snakeTail.rawValue
+        pixel[8][7].image(name: item.snakeTailLeft.rawValue)
+        pixelValue[8][7] = itemValue.snakeTail.rawValue + moveDirection.left.rawValue
         snakeArray.append(.init(x: 8, y: 7))
         
         //food defined
@@ -250,7 +274,6 @@ class EatingSnake: UIViewController {
     }
     
     @objc func snakeWalk() {
-
         switch direction {
         case moveDirection.up:
             //print("walk - up")
@@ -313,8 +336,8 @@ class EatingSnake: UIViewController {
     
     func snakeBodyMove(headOrg: (x: Int, y: Int), headNew: (x: Int, y: Int), tailOrg:  (x: Int, y: Int), tailNew:  (x: Int, y: Int)) {
         var isRemoveTail: Bool = true
-        //head move
-        pixel[headNew.x][headNew.y].text = item.snakeHead.rawValue
+        
+        //judegement head eat food or body
         //eat food (head = food)
         if pixelValue[headNew.x][headNew.y] == itemValue.food.rawValue {
             print("eat food")
@@ -324,27 +347,65 @@ class EatingSnake: UIViewController {
             isRemoveTail = false
             setTimer(level: level)
         //eat body (die...)
-        } else if pixelValue[headNew.x][headNew.y] == itemValue.snakeBody.rawValue || pixelValue[headNew.x][headNew.y] == itemValue.snakeTail.rawValue {
+        } else if pixelValue[headNew.x][headNew.y] == Int(itemValue.snakeBody.rawValue/10)*10 || Int(pixelValue[headNew.x][headNew.y]/10)*10 == itemValue.snakeTail.rawValue {
             print("eat body")
             timer.fireDate = NSDate.distantFuture
             reStartAlarm()
         }
-        pixelValue[headNew.x][headNew.y] = itemValue.snakeHead.rawValue
-        pixel[headOrg.x][headOrg.y].text = item.snakeBody.rawValue
-        pixelValue[headOrg.x][headOrg.y] = itemValue.snakeBody.rawValue
+
+        //head move
+        switch direction.rawValue {
+        case moveDirection.up.rawValue:
+            pixel[headNew.x][headNew.y].image(name: item.snakeHeadUp.rawValue)
+        case moveDirection.left.rawValue:
+            pixel[headNew.x][headNew.y].image(name: item.snakeHeadLeft.rawValue)
+        case moveDirection.down.rawValue:
+            pixel[headNew.x][headNew.y].image(name: item.snakeHeadDown.rawValue)
+        case moveDirection.right.rawValue:
+            pixel[headNew.x][headNew.y].image(name: item.snakeHeadRight.rawValue)
+        default:
+            pixel[headNew.x][headNew.y].image(name: item.snakeHeadUp.rawValue)
+        }
+        pixelValue[headNew.x][headNew.y] = itemValue.snakeHead.rawValue + direction.rawValue
         snakeArray.insert(.init(x: headNew.x, y: headNew.y), at: 0)
-        
+
+        //Body move
+        switch pixelValue[headOrg.x][headOrg.y]%10 {
+        case moveDirection.up.rawValue:
+            pixel[headOrg.x][headOrg.y].image(name: item.snakeBodyUp.rawValue)
+        case moveDirection.left.rawValue:
+            pixel[headOrg.x][headOrg.y].image(name: item.snakeBodyLeft.rawValue)
+        case moveDirection.down.rawValue:
+            pixel[headOrg.x][headOrg.y].image(name: item.snakeBodyDown.rawValue)
+        case moveDirection.right.rawValue:
+            pixel[headOrg.x][headOrg.y].image(name: item.snakeBodyRight.rawValue)
+        default:
+            pixel[headOrg.x][headOrg.y].image(name: item.snakeBodyUp.rawValue)
+        }
+        pixelValue[headOrg.x][headOrg.y] = itemValue.snakeBody.rawValue + pixelValue[headOrg.x][headOrg.y]%10
+
         //tail move
         if isRemoveTail {
-            pixel[tailOrg.x][tailOrg.y].text = item.none.rawValue
+            switch pixelValue[tailNew.x][tailNew.y]%10 {
+            case moveDirection.up.rawValue:
+                pixel[tailNew.x][tailNew.y].image(name: item.snakeTailUp.rawValue)
+            case moveDirection.left.rawValue:
+                pixel[tailNew.x][tailNew.y].image(name: item.snakeTailLeft.rawValue)
+            case moveDirection.down.rawValue:
+                pixel[tailNew.x][tailNew.y].image(name: item.snakeTailDown.rawValue)
+            case moveDirection.right.rawValue:
+                pixel[tailNew.x][tailNew.y].image(name: item.snakeTailRight.rawValue)
+            default:
+                pixel[tailNew.x][tailNew.y].image(name: item.snakeTailUp.rawValue)
+            }
+            pixelValue[tailNew.x][tailNew.y] = itemValue.snakeTail.rawValue + pixelValue[tailNew.x][tailNew.y]%10
+            pixel[tailOrg.x][tailOrg.y].image(name: "none")
             pixelValue[tailOrg.x][tailOrg.y] = itemValue.none.rawValue
-            pixel[tailNew.x][tailNew.y].text = item.snakeTail.rawValue
-            pixelValue[headOrg.x][headOrg.y] = itemValue.snakeTail.rawValue
             snakeArray.removeLast()
         } else {
             isRemoveTail = true
         }
-    
+
         //check and generate food
         var hadFood: Bool = false
         for i in 0...14 {
@@ -367,6 +428,17 @@ class EatingSnake: UIViewController {
     }
 
     
+}
+
+extension UILabel {
+    func image(name: String) {
+        let attributedString = NSMutableAttributedString(string: " ")
+        let textAttachment = NSTextAttachment()
+        textAttachment.image = UIImage(named: name)
+        let attrStringWithImage = NSAttributedString(attachment: textAttachment)
+        attributedString.replaceCharacters(in: NSMakeRange(0, 1), with: attrStringWithImage)
+        self.attributedText = attributedString
+    }
 }
 
 
