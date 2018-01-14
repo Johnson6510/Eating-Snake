@@ -278,7 +278,7 @@ class EatingSnake: UIViewController {
         snakeArray.removeAll()
         
         //snake head defined
-        pixel[7][7].image(name: item.snakeBodyLeft.rawValue)
+        pixel[7][7].image(name: item.snakeHeadLeft.rawValue)
         pixelValue[7][7] = itemValue.snakeHead.rawValue + moveDirection.left.rawValue
         snakeArray.append(.init(x: 7, y: 7))
         
