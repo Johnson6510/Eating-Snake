@@ -142,8 +142,11 @@ class EatingSnake: UIViewController {
 
         //initial background image
         allView.addBackground()
-        snakeView.transform = CGAffineTransform(translationX: (UIScreen.main.bounds.size.width-300)/2, y: (UIScreen.main.bounds.size.height-300)/2)
-        snakeView.backgroundColor = UIColor(patternImage: UIImage(named: "ground")!)
+        snakeView.addSnakeBackground()
+        //snakeView.transform = CGAffineTransform(translationX: (UIScreen.main.bounds.size.width-300)/2, y: (UIScreen.main.bounds.size.height-300)/2)
+        //snakeView.backgroundColor = UIColor(patternImage: UIImage(named: "ground")!)
+        //imageViewBackground.contentMode = UIViewContentMode.scaleAspectFill
+
 
         //initial sound
         let soundPath1 = Bundle.main.path(forResource: "eat", ofType: "mp3")
@@ -523,11 +526,7 @@ extension UILabel {
 
 extension UIView {
     func addBackground() {
-        // screen width and height:
-        let width = UIScreen.main.bounds.size.width
-        let height = UIScreen.main.bounds.size.height
-        
-        let imageViewBackground = UIImageView(frame: CGRect(x: 0, y: 0, width: width, height: height))
+        let imageViewBackground = UIImageView(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.size.width, height: UIScreen.main.bounds.size.height))
         imageViewBackground.image = UIImage(named: "grassland")
         
         // you can change the content mode:
@@ -536,6 +535,21 @@ extension UIView {
         self.addSubview(imageViewBackground)
         self.sendSubview(toBack: imageViewBackground)
     }
+    
+    func addSnakeBackground() {
+        self.transform = CGAffineTransform(translationX: (UIScreen.main.bounds.size.width-300)/2, y: (UIScreen.main.bounds.size.height-300)/2)
+        
+        let imageViewBackground = UIImageView(frame: CGRect(x: 0, y: 0, width: 300, height: 300))
+        imageViewBackground.image = UIImage(named: "ground")
+        
+        // you can change the content mode:
+        imageViewBackground.contentMode = UIViewContentMode.scaleAspectFill
+        
+        self.addSubview(imageViewBackground)
+        self.sendSubview(toBack: imageViewBackground)
+    }
+
+
 }
 
 
