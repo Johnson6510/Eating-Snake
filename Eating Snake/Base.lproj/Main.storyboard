@@ -49,14 +49,6 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="a7k-6s-93H">
-                                <rect key="frame" x="36" y="185" width="300" height="300"/>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="300" id="HpL-nu-vmn"/>
-                                    <constraint firstAttribute="height" constant="300" id="Mux-Sg-C8h"/>
-                                </constraints>
-                            </view>
                             <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="QhG-L0-dNb">
                                 <rect key="frame" x="0.0" y="20" width="375" height="44"/>
                                 <items>
@@ -74,19 +66,22 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="a7k-6s-93H">
+                                <rect key="frame" x="0.0" y="0.0" width="300" height="300"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </view>
                         </subviews>
                         <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="QhG-L0-dNb" firstAttribute="top" secondItem="61o-5r-DXj" secondAttribute="top" constant="20" id="7zD-4x-DWf"/>
-                            <constraint firstItem="a7k-6s-93H" firstAttribute="leading" secondItem="hLD-Xp-lkq" secondAttribute="leading" constant="36" id="L3T-VM-dkT"/>
                             <constraint firstItem="QhG-L0-dNb" firstAttribute="leading" secondItem="61o-5r-DXj" secondAttribute="leading" id="aNG-Ke-taF"/>
                             <constraint firstItem="hLD-Xp-lkq" firstAttribute="trailing" secondItem="QhG-L0-dNb" secondAttribute="trailing" id="at5-RW-BSs"/>
-                            <constraint firstItem="hLD-Xp-lkq" firstAttribute="bottom" secondItem="a7k-6s-93H" secondAttribute="bottom" constant="182" id="i2r-yP-meZ"/>
-                            <constraint firstItem="hLD-Xp-lkq" firstAttribute="trailing" secondItem="a7k-6s-93H" secondAttribute="trailing" constant="39" id="jTz-tp-GJG"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="hLD-Xp-lkq"/>
                     </view>
                     <connections>
+                        <outlet property="allView" destination="61o-5r-DXj" id="pMy-B7-Lni"/>
                         <outlet property="scoreLabel" destination="kuZ-Rx-wNN" id="0fk-Yh-34W"/>
                         <outlet property="snakeView" destination="a7k-6s-93H" id="Xwp-gv-HwM"/>
                     </connections>
@@ -94,7 +89,7 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="kkg-Kk-OWL" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <swipeGestureRecognizer direction="right" id="xE5-71-ymh"/>
             </objects>
-            <point key="canvasLocation" x="782" y="34"/>
+            <point key="canvasLocation" x="781.60000000000002" y="33.733133433283363"/>
         </scene>
     </scenes>
 </document>

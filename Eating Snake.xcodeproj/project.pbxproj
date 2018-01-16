@@ -9,12 +9,12 @@
 /* Begin PBXBuildFile section */
 		BD418DAB200280C50083EC2B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD418DAA200280C50083EC2B /* AppDelegate.swift */; };
 		BD418DAD200280C50083EC2B /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD418DAC200280C50083EC2B /* ViewController.swift */; };
-		BD418DB0200280C50083EC2B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BD418DAE200280C50083EC2B /* Main.storyboard */; };
 		BD418DB2200280C50083EC2B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BD418DB1200280C50083EC2B /* Assets.xcassets */; };
 		BD418DBD200281F40083EC2B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BD418DBC200281F40083EC2B /* LaunchScreen.storyboard */; };
 		BD418DBF20028A060083EC2B /* EatingSnake.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD418DBE20028A060083EC2B /* EatingSnake.swift */; };
 		BD6AE751200937A000C4A448 /* eat.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = BD6AE74F200937A000C4A448 /* eat.mp3 */; };
 		BD6AE752200937A000C4A448 /* woman-die.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = BD6AE750200937A000C4A448 /* woman-die.mp3 */; };
+		BDBEC430200CA4B3001CC172 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BD418DAE200280C50083EC2B /* Main.storyboard */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -133,9 +133,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				BD418DB2200280C50083EC2B /* Assets.xcassets in Resources */,
+				BDBEC430200CA4B3001CC172 /* Main.storyboard in Resources */,
 				BD418DBD200281F40083EC2B /* LaunchScreen.storyboard in Resources */,
 				BD6AE752200937A000C4A448 /* woman-die.mp3 in Resources */,
-				BD418DB0200280C50083EC2B /* Main.storyboard in Resources */,
 				BD6AE751200937A000C4A448 /* eat.mp3 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
