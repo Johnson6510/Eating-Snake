@@ -32,7 +32,12 @@ class EatingSnake: UIViewController {
 
     var score = 0
     var level = 1
+    var sick = 0
+    var fast = 0
+    var sickLevel = -1
+    var fastLevel = -1
     var timeInterval: Double = 0.0
+    
     @IBOutlet weak var scoreLabel: UILabel!
 
     @IBOutlet weak var snakeView: UIView!
@@ -92,10 +97,15 @@ class EatingSnake: UIViewController {
     
     @objc(up:)
     func upCommand(_ r: UIGestureRecognizer!) {
-        print("Swipe - Up")
         if direction == moveDirection.left || direction == moveDirection.right {
             if isSnakeMove {
-                direction = moveDirection.up
+                if sick == 0 {
+                    print("Swipe - Up")
+                    direction = moveDirection.up
+                } else {
+                    print("Swipe - Up (sick to down)")
+                    direction = moveDirection.down
+                }
                 isSnakeMove = false
             }
         }
@@ -103,10 +113,15 @@ class EatingSnake: UIViewController {
     
     @objc(down:)
     func downCommand(_ r: UIGestureRecognizer!) {
-        print("Swipe - Down")
         if direction == moveDirection.left || direction == moveDirection.right {
             if isSnakeMove {
-                direction = moveDirection.down
+                if sick == 0 {
+                    print("Swipe - Down")
+                    direction = moveDirection.down
+                } else {
+                    print("Swipe - Down (sick to up)")
+                    direction = moveDirection.up
+                }
                 isSnakeMove = false
             }
         }
@@ -114,10 +129,15 @@ class EatingSnake: UIViewController {
     
     @objc(left:)
     func leftCommand(_ r: UIGestureRecognizer!) {
-        print("Swipe - Left")
         if direction == moveDirection.up || direction == moveDirection.down {
             if isSnakeMove {
-                direction = moveDirection.left
+                if sick == 0 {
+                    print("Swipe - Left")
+                    direction = moveDirection.left
+                } else {
+                    print("Swipe - Left (sick to right)")
+                    direction = moveDirection.right
+                }
                 isSnakeMove = false
             }
         }
@@ -125,10 +145,15 @@ class EatingSnake: UIViewController {
     
     @objc(right:)
     func rightCommand(_ r: UIGestureRecognizer!) {
-        print("Swipe - Right")
         if direction == moveDirection.up || direction == moveDirection.down {
             if isSnakeMove {
-                direction = moveDirection.right
+                if sick == 0 {
+                    print("Swipe - Right")
+                    direction = moveDirection.right
+                } else {
+                    print("Swipe - Right (sick to left)")
+                    direction = moveDirection.left
+                }
                 isSnakeMove = false
             }
         }
@@ -225,6 +250,8 @@ class EatingSnake: UIViewController {
         case snakeTailLeft = "snakeTailLeft"
         case snakeTailDown = "snakeTailDown"
         case snakeTailRight = "snakeTailRight"
+        case toxicMushroom = "🍄"
+        case pufferFish = "🐡"
         case food = "🍖"
         case none = " "
     }
@@ -235,6 +262,8 @@ class EatingSnake: UIViewController {
         case snakeBody = 40
         case snakeTail = 30
 
+        case toxicMushroom = 77
+        case pufferFish = 88
         case food = 99
         case none = 0
 
@@ -278,7 +307,7 @@ class EatingSnake: UIViewController {
         snakeArray.append(.init(x: 8, y: 7))
 
         //food defined
-        addFood()
+        //addFood()
     }
     
     func pixelReset() {
@@ -302,7 +331,7 @@ class EatingSnake: UIViewController {
         snakeArray.append(.init(x: 8, y: 7))
         
         //food defined
-        addFood()
+        //addFood()
     }
 
     func addPixel(location: (Int, Int)) -> UILabel {
@@ -324,6 +353,34 @@ class EatingSnake: UIViewController {
             if pixelValue[x][y] == itemValue.none.rawValue {
                 pixelValue[x][y] = itemValue.food.rawValue
                 pixel[x][y].text = item.food.rawValue
+                ret = true
+            }
+            ret = false
+        } while ret == true
+    }
+
+    func addPufferFish() {
+        var ret: Bool?
+        repeat {
+            let x = Int(arc4random_uniform(15))
+            let y = Int(arc4random_uniform(15))
+            if pixelValue[x][y] == itemValue.none.rawValue {
+                pixelValue[x][y] = itemValue.pufferFish.rawValue
+                pixel[x][y].text = item.pufferFish.rawValue
+                ret = true
+            }
+            ret = false
+        } while ret == true
+    }
+    
+    func addToxicMushroom() {
+        var ret: Bool?
+        repeat {
+            let x = Int(arc4random_uniform(15))
+            let y = Int(arc4random_uniform(15))
+            if pixelValue[x][y] == itemValue.none.rawValue {
+                pixelValue[x][y] = itemValue.toxicMushroom.rawValue
+                pixel[x][y].text = item.toxicMushroom.rawValue
                 ret = true
             }
             ret = false
@@ -395,18 +452,59 @@ class EatingSnake: UIViewController {
     func snakeBodyMove(headOrg: (x: Int, y: Int), headNew: (x: Int, y: Int), tailOrg:  (x: Int, y: Int), tailNew:  (x: Int, y: Int)) {
         var isRemoveTail: Bool = true
         
+        if fast > 0 {
+            fast -= 1
+        }
+        if fast == 0 {
+            setTimer(level: level)
+        }
+        
+        if sick > 0 {
+            sick -= 1
+        }
+
         //head move
         switch direction.rawValue {
         case moveDirection.up.rawValue:
-            pixel[headNew.x][headNew.y].image(name: item.snakeHeadUp.rawValue)
+            if sick > 0 {
+                pixel[headNew.x][headNew.y].imageColorInvert(name: item.snakeHeadUp.rawValue)
+            } else if fast > 0 {
+                pixel[headNew.x][headNew.y].imageFalseColor(name: item.snakeHeadUp.rawValue)
+            } else {
+                pixel[headNew.x][headNew.y].image(name: item.snakeHeadUp.rawValue)
+            }
         case moveDirection.left.rawValue:
-            pixel[headNew.x][headNew.y].image(name: item.snakeHeadLeft.rawValue)
+            if sick > 0 {
+                pixel[headNew.x][headNew.y].imageColorInvert(name: item.snakeHeadLeft.rawValue)
+            } else if fast > 0 {
+                pixel[headNew.x][headNew.y].imageFalseColor(name: item.snakeHeadLeft.rawValue)
+            } else {
+                pixel[headNew.x][headNew.y].image(name: item.snakeHeadLeft.rawValue)
+            }
         case moveDirection.down.rawValue:
-            pixel[headNew.x][headNew.y].image(name: item.snakeHeadDown.rawValue)
+            if sick > 0 {
+                pixel[headNew.x][headNew.y].imageColorInvert(name: item.snakeHeadDown.rawValue)
+            } else if fast > 0 {
+                pixel[headNew.x][headNew.y].imageFalseColor(name: item.snakeHeadDown.rawValue)
+            } else {
+                pixel[headNew.x][headNew.y].image(name: item.snakeHeadDown.rawValue)
+            }
         case moveDirection.right.rawValue:
-            pixel[headNew.x][headNew.y].image(name: item.snakeHeadRight.rawValue)
+            if sick > 0 {
+                pixel[headNew.x][headNew.y].imageColorInvert(name: item.snakeHeadRight.rawValue)
+            } else if fast > 0 {
+                pixel[headNew.x][headNew.y].imageFalseColor(name: item.snakeHeadRight.rawValue)
+            } else {
+                pixel[headNew.x][headNew.y].image(name: item.snakeHeadRight.rawValue)
+            }
         default:
-            pixel[headNew.x][headNew.y].image(name: item.snakeHeadUp.rawValue)
+            if sick > 0 {
+                pixel[headNew.x][headNew.y].imageColorInvert(name: item.snakeHeadUp.rawValue)
+            } else if fast > 0 {
+                pixel[headNew.x][headNew.y].imageFalseColor(name: item.snakeHeadUp.rawValue)
+            } else {
+                pixel[headNew.x][headNew.y].image(name: item.snakeHeadUp.rawValue)
+            }
         }
         //judegement head eat food or body
         if pixelValue[headNew.x][headNew.y] == itemValue.food.rawValue {
@@ -418,6 +516,31 @@ class EatingSnake: UIViewController {
             scoreLabel.text = "Score: " + String(score) + ", Lv: " + String(level)
             isRemoveTail = false
             setTimer(level: level)
+        } else if pixelValue[headNew.x][headNew.y] == itemValue.toxicMushroom.rawValue {
+            //eat Toxic Mushroom (head = Toxic Mushroom)
+            voiceEat.play()
+            print("eat Toxic Mushroom")
+            if score > 10 {
+                score -= 10
+            } else {
+                score = 0
+            }
+            fast = 10
+            fastLevel = level
+            scoreLabel.text = "Score: " + String(score) + ", Lv: " + String(level)
+            setTimer(level: level + 20)
+        } else if pixelValue[headNew.x][headNew.y] == itemValue.pufferFish.rawValue {
+            //eat Puffer Fish (head = Puffer Fish)
+            voiceEat.play()
+            print("eat Puffer Fish")
+            if score > 50 {
+                score -= 50
+            } else {
+                score = 0
+            }
+            sick = 10
+            sickLevel = level
+            scoreLabel.text = "Score: " + String(score) + ", Lv: " + String(level)
         } else if Int(pixelValue[headNew.x][headNew.y]/10) == itemValue.snakeBody.rawValue/10 || Int(pixelValue[headNew.x][headNew.y]/10) == itemValue.snakeTail.rawValue/10 {
             //eat body (die...)
             voiceDie.play()
@@ -491,13 +614,27 @@ class EatingSnake: UIViewController {
 
         //check and generate food
         var hadFood: Bool = false
+        var hadMushroom: Bool = false
+        var hadFish: Bool = false
         for i in 0...14 {
             if pixelValue[i].contains(where: { $0 == itemValue.food.rawValue }) {
                 hadFood = true
             }
+            if pixelValue[i].contains(where: { $0 == itemValue.toxicMushroom.rawValue }) {
+                hadMushroom = true
+            }
+            if pixelValue[i].contains(where: { $0 == itemValue.pufferFish.rawValue }) {
+                hadFish = true
+            }
         }
         if !hadFood {
             addFood()
+        }
+        if level%3 == 0 && !hadMushroom && fastLevel != level {
+            addToxicMushroom()
+        }
+        if level%10 == 0 && !hadFish && sickLevel != level {
+            addPufferFish()
         }
     }
     
@@ -521,6 +658,34 @@ extension UILabel {
         let attrStringWithImage = NSAttributedString(attachment: textAttachment)
         attributedString.replaceCharacters(in: NSMakeRange(0, 1), with: attrStringWithImage)
         self.attributedText = attributedString
+    }
+    
+    func imageColorInvert(name: String) {
+        let beginImage = CIImage(image: UIImage(named: name)!)
+        if let filter = CIFilter(name: "CIColorInvert") {
+            filter.setValue(beginImage, forKey: kCIInputImageKey)
+            
+            let attributedString = NSMutableAttributedString(string: " ")
+            let textAttachment = NSTextAttachment()
+            textAttachment.image = UIImage(ciImage: filter.outputImage!)
+            let attrStringWithImage = NSAttributedString(attachment: textAttachment)
+            attributedString.replaceCharacters(in: NSMakeRange(0, 1), with: attrStringWithImage)
+            self.attributedText = attributedString
+        }
+    }
+    
+    func imageFalseColor(name: String) {
+        let beginImage = CIImage(image: UIImage(named: name)!)
+        if let filter = CIFilter(name: "CIFalseColor") {
+            filter.setValue(beginImage, forKey: kCIInputImageKey)
+            
+            let attributedString = NSMutableAttributedString(string: " ")
+            let textAttachment = NSTextAttachment()
+            textAttachment.image = UIImage(ciImage: filter.outputImage!)
+            let attrStringWithImage = NSAttributedString(attachment: textAttachment)
+            attributedString.replaceCharacters(in: NSMakeRange(0, 1), with: attrStringWithImage)
+            self.attributedText = attributedString
+        }
     }
 }
 
