@@ -26,17 +26,29 @@ class EatingSnake: UIViewController {
     var timer = Timer()
 
     var pixel = [[UILabel]]()
-    var pixelValue = [[Int]]()
     var snakeArray = [location()]
     var isSnakeMove: Bool = true
 
-    var score = 0
-    var level = 1
+    var level: Int = 1
+    var score: Int = 0 {
+        didSet {
+            scoreLabel.text = "Score: " + String(score) + ", Lv: " + String(level)
+        }
+    }
+    
     var sick = 0
     var fast = 0
     var sickLevel = -1
     var fastLevel = -1
     var timeInterval: Double = 0.0
+
+    var direction: Int = UILabel.moveDirection.left.rawValue {
+        willSet {
+            lastDirection = direction
+        }
+    }
+    var lastDirection: Int = UILabel.moveDirection.left.rawValue
+
     
     @IBOutlet weak var scoreLabel: UILabel!
 
@@ -57,6 +69,57 @@ class EatingSnake: UIViewController {
         }
     }
     
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        // Do any additional setup after loading the view.
+        //setup voice - eat
+        
+        //initial background image
+        allView.addBackground()
+        snakeView.addSnakeBackground()
+        
+        //initial sound
+        let soundPath1 = Bundle.main.path(forResource: "eat", ofType: "mp3")
+        do {
+            voiceEat = try AVAudioPlayer(contentsOf: NSURL.fileURL(withPath: soundPath1!))
+            voiceEat.numberOfLoops = 0 // 重複播放次數 設為 0 則是只播放一次 不重複
+        } catch {
+            print("error")
+        }
+        
+        let soundPath2 = Bundle.main.path(forResource: "woman-die", ofType: "mp3")
+        do {
+            voiceDie = try AVAudioPlayer(contentsOf: NSURL.fileURL(withPath: soundPath2!))
+            voiceDie.numberOfLoops = 0 // 重複播放次數 設為 0 則是只播放一次 不重複
+        } catch {
+            print("error")
+        }
+        
+        //initial swip control
+        setupSwipeControls()
+        
+        //initial game
+        scoreLabel.text = "Score: " + String(score) + ", Lv: " + String(level)
+        pixelInit()
+        setTimer(level: level)
+    }
+    
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
+    }
+    
+    /*
+     // MARK: - Navigation
+     
+     // In a storyboard-based application, you will often want to do a little preparation before navigation
+     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+     // Get the new view controller using segue.destinationViewController.
+     // Pass the selected object to the new view controller.
+     }
+     */
+
     func reStartAlarm() {
         let alert = UIAlertController(title: "好慘！吃到自己了", message: "要重生嗎？", preferredStyle: UIAlertControllerStyle.alert)
         alert.addAction(UIAlertAction(title: "重生", style: .default, handler: { action in
@@ -72,7 +135,6 @@ class EatingSnake: UIViewController {
         present(alert, animated: true, completion: nil)
     }
 
-        
     func setupSwipeControls() {
         let upSwipe = UISwipeGestureRecognizer(target: self, action: #selector(EatingSnake.upCommand(_:)))
         upSwipe.numberOfTouchesRequired = 1
@@ -97,14 +159,14 @@ class EatingSnake: UIViewController {
     
     @objc(up:)
     func upCommand(_ r: UIGestureRecognizer!) {
-        if direction == moveDirection.left || direction == moveDirection.right {
+        if direction == UILabel.moveDirection.left.rawValue || direction == UILabel.moveDirection.right.rawValue {
             if isSnakeMove {
                 if sick == 0 {
                     print("Swipe - Up")
-                    direction = moveDirection.up
+                    direction = UILabel.moveDirection.up.rawValue
                 } else {
                     print("Swipe - Up (sick to down)")
-                    direction = moveDirection.down
+                    direction = UILabel.moveDirection.down.rawValue
                 }
                 isSnakeMove = false
             }
@@ -113,14 +175,14 @@ class EatingSnake: UIViewController {
     
     @objc(down:)
     func downCommand(_ r: UIGestureRecognizer!) {
-        if direction == moveDirection.left || direction == moveDirection.right {
+        if direction == UILabel.moveDirection.left.rawValue || direction == UILabel.moveDirection.right.rawValue {
             if isSnakeMove {
                 if sick == 0 {
                     print("Swipe - Down")
-                    direction = moveDirection.down
+                    direction = UILabel.moveDirection.down.rawValue
                 } else {
                     print("Swipe - Down (sick to up)")
-                    direction = moveDirection.up
+                    direction = UILabel.moveDirection.up.rawValue
                 }
                 isSnakeMove = false
             }
@@ -129,14 +191,14 @@ class EatingSnake: UIViewController {
     
     @objc(left:)
     func leftCommand(_ r: UIGestureRecognizer!) {
-        if direction == moveDirection.up || direction == moveDirection.down {
+        if direction == UILabel.moveDirection.up.rawValue || direction == UILabel.moveDirection.down.rawValue {
             if isSnakeMove {
                 if sick == 0 {
                     print("Swipe - Left")
-                    direction = moveDirection.left
+                    direction = UILabel.moveDirection.left.rawValue
                 } else {
                     print("Swipe - Left (sick to right)")
-                    direction = moveDirection.right
+                    direction = UILabel.moveDirection.right.rawValue
                 }
                 isSnakeMove = false
             }
@@ -145,151 +207,34 @@ class EatingSnake: UIViewController {
     
     @objc(right:)
     func rightCommand(_ r: UIGestureRecognizer!) {
-        if direction == moveDirection.up || direction == moveDirection.down {
+        if direction == UILabel.moveDirection.up.rawValue || direction == UILabel.moveDirection.down.rawValue {
             if isSnakeMove {
                 if sick == 0 {
                     print("Swipe - Right")
-                    direction = moveDirection.right
+                    direction = UILabel.moveDirection.right.rawValue
                 } else {
                     print("Swipe - Right (sick to left)")
-                    direction = moveDirection.left
+                    direction = UILabel.moveDirection.left.rawValue
                 }
                 isSnakeMove = false
             }
         }
     }
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
-        //setup voice - eat
-
-        //initial background image
-        allView.addBackground()
-        snakeView.addSnakeBackground()
-        //snakeView.transform = CGAffineTransform(translationX: (UIScreen.main.bounds.size.width-300)/2, y: (UIScreen.main.bounds.size.height-300)/2)
-        //snakeView.backgroundColor = UIColor(patternImage: UIImage(named: "ground")!)
-        //imageViewBackground.contentMode = UIViewContentMode.scaleAspectFill
-
-
-        //initial sound
-        let soundPath1 = Bundle.main.path(forResource: "eat", ofType: "mp3")
-        do {
-            voiceEat = try AVAudioPlayer(contentsOf: NSURL.fileURL(withPath: soundPath1!))
-            voiceEat.numberOfLoops = 0 // 重複播放次數 設為 0 則是只播放一次 不重複
-        } catch {
-            print("error")
-        }
-
-        let soundPath2 = Bundle.main.path(forResource: "woman-die", ofType: "mp3")
-        do {
-            voiceDie = try AVAudioPlayer(contentsOf: NSURL.fileURL(withPath: soundPath2!))
-            voiceDie.numberOfLoops = 0 // 重複播放次數 設為 0 則是只播放一次 不重複
-        } catch {
-            print("error")
-        }
-
-        //initial swip control
-        setupSwipeControls()
-        
-        //initial game
-        scoreLabel.text = "Score: " + String(score) + ", Lv: " + String(level)
-        pixelInit()
-        setTimer(level: level)
-    }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-    
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
-    
     func setTimer(level: Int) {
         timer.invalidate()
         timeInterval = 0.5 - Double(level - 1) * 0.005
         timer = Timer.scheduledTimer(timeInterval: timeInterval, target: self, selector: #selector(EatingSnake.snakeWalk), userInfo: nil, repeats: true)
     }
     
-    var direction = moveDirection.left
-    enum moveDirection: Int {
-        case up = 1
-        case left = 2
-        case down = 3
-        case right = 4
-    }
-
-    enum item: String {
-        case snakeHeadUp = "snakeHeadUp"
-        case snakeHeadLeft = "snakeHeadLeft"
-        case snakeHeadDown = "snakeHeadDown"
-        case snakeHeadRight = "snakeHeadRight"
-        case snakeBodyUp = "snakeBodyUp"
-        case snakeBodyUpLeft = "snakeBodyUpLeft"
-        case snakeBodyUpRight = "snakeBodyUpRight"
-        case snakeBodyLeft = "snakeBodyLeft"
-        case snakeBodyLeftUp = "snakeBodyLeftUp"
-        case snakeBodyLeftDown = "snakeBodyLeftDown"
-        case snakeBodyDown = "snakeBodyDown"
-        case snakeBodyDownLeft = "snakeBodyDownLeft"
-        case snakeBodyDownRight = "snakeBodyDownRight"
-        case snakeBodyRight = "snakeBodyRight"
-        case snakeBodyRightUp = "snakeBodyRightUp"
-        case snakeBodyRightDown = "snakeBodyRightDown"
-        case snakeTailUp = "snakeTailUp"
-        case snakeTailLeft = "snakeTailLeft"
-        case snakeTailDown = "snakeTailDown"
-        case snakeTailRight = "snakeTailRight"
-        case toxicMushroom = "🍄"
-        case pufferFish = "🐡"
-        case food = "🍖"
-        case none = " "
-    }
-    
-    //10位數 = 蛇的部位，個位數 = 方向
-    enum itemValue: Int {
-        case snakeHead = 50
-        case snakeBody = 40
-        case snakeTail = 30
-
-        case toxicMushroom = 77
-        case pufferFish = 88
-        case food = 99
-        case none = 0
-
-        case snakeHeadUp = 51
-        case snakeHeadLeft = 52
-        case snakeHeadDown = 53
-        case snakeHeadRight = 54
-        case snakeBodyUp = 41
-        case snakeBodyLeft = 42
-        case snakeBodyDown = 43
-        case snakeBodyRight = 44
-        case snakeTailUp = 31
-        case snakeTailLeft = 32
-        case snakeTailDown = 33
-        case snakeTailRight = 34
-    }
-    
     func pixelInit() {
         pixel.removeAll()
-        pixelValue.removeAll()
         for x in 0...14 {
             pixel.append([UILabel]())
-            pixelValue.append([Int]())
             for y in 0...14 {
                 pixel[x].append(addPixel(location: (x, y)))
-                pixelValue[x].append(0)
+                pixel[x][y].status = UILabel.status.normal.rawValue
+                pixel[x][y].value = UILabel.itemValue.none.rawValue
                 snakeView.addSubview(pixel[x][y])
             }
         }
@@ -297,41 +242,34 @@ class EatingSnake: UIViewController {
         snakeArray.removeAll()
         
         //snake head defined
-        pixel[7][7].image(name: item.snakeHeadLeft.rawValue)
-        pixelValue[7][7] = itemValue.snakeHead.rawValue + moveDirection.left.rawValue
+        pixel[7][7].value = UILabel.itemValue.snakeHead.rawValue + direction
         snakeArray.append(.init(x: 7, y: 7))
 
         //snake tail defined
-        pixel[8][7].image(name: item.snakeTailLeft.rawValue)
-        pixelValue[8][7] = itemValue.snakeTail.rawValue + moveDirection.left.rawValue
+        pixel[8][7].value = UILabel.itemValue.snakeTail.rawValue + direction
         snakeArray.append(.init(x: 8, y: 7))
-
-        //food defined
-        //addFood()
     }
     
     func pixelReset() {
         for x in 0...14 {
             for y in 0...14 {
-                pixel[x][y].text = item.none.rawValue
-                pixelValue[x][y] = itemValue.none.rawValue
+                pixel[x][y].status = UILabel.status.normal.rawValue
+                pixel[x][y].value = UILabel.itemValue.none.rawValue
             }
         }
         //clear snake array
         snakeArray.removeAll()
         
+        direction = UILabel.moveDirection.left.rawValue
+        lastDirection = UILabel.moveDirection.left.rawValue
+
         //snake head defined
-        pixel[7][7].image(name: item.snakeHeadLeft.rawValue)
-        pixelValue[7][7] = itemValue.snakeHead.rawValue + moveDirection.left.rawValue
+        pixel[7][7].value = UILabel.itemValue.snakeHead.rawValue + direction
         snakeArray.append(.init(x: 7, y: 7))
         
         //snake tail defined
-        pixel[8][7].image(name: item.snakeTailLeft.rawValue)
-        pixelValue[8][7] = itemValue.snakeTail.rawValue + moveDirection.left.rawValue
+        pixel[8][7].value = UILabel.itemValue.snakeTail.rawValue + direction
         snakeArray.append(.init(x: 8, y: 7))
-        
-        //food defined
-        //addFood()
     }
 
     func addPixel(location: (Int, Int)) -> UILabel {
@@ -340,7 +278,7 @@ class EatingSnake: UIViewController {
         label.center = CGPoint(x: x*20+10, y: y*20+10)
         label.textAlignment = .natural
         label.adjustsFontSizeToFitWidth = true
-        label.text = item.none.rawValue
+        label.value = UILabel.itemValue.none.rawValue
 
         return label
     }
@@ -350,13 +288,12 @@ class EatingSnake: UIViewController {
         repeat {
             let x = Int(arc4random_uniform(15))
             let y = Int(arc4random_uniform(15))
-            if pixelValue[x][y] == itemValue.none.rawValue {
-                pixelValue[x][y] = itemValue.food.rawValue
-                pixel[x][y].text = item.food.rawValue
+            if pixel[x][y].value == UILabel.itemValue.none.rawValue {
+                pixel[x][y].value = UILabel.itemValue.food.rawValue
                 ret = true
             }
             ret = false
-        } while ret == true
+        } while ret!
     }
 
     func addPufferFish() {
@@ -364,13 +301,12 @@ class EatingSnake: UIViewController {
         repeat {
             let x = Int(arc4random_uniform(15))
             let y = Int(arc4random_uniform(15))
-            if pixelValue[x][y] == itemValue.none.rawValue {
-                pixelValue[x][y] = itemValue.pufferFish.rawValue
-                pixel[x][y].text = item.pufferFish.rawValue
+            if pixel[x][y].value == UILabel.itemValue.none.rawValue {
+                pixel[x][y].value = UILabel.itemValue.pufferFish.rawValue
                 ret = true
             }
             ret = false
-        } while ret == true
+        } while ret!
     }
     
     func addToxicMushroom() {
@@ -378,18 +314,17 @@ class EatingSnake: UIViewController {
         repeat {
             let x = Int(arc4random_uniform(15))
             let y = Int(arc4random_uniform(15))
-            if pixelValue[x][y] == itemValue.none.rawValue {
-                pixelValue[x][y] = itemValue.toxicMushroom.rawValue
-                pixel[x][y].text = item.toxicMushroom.rawValue
+            if pixel[x][y].value == UILabel.itemValue.none.rawValue {
+                pixel[x][y].value = UILabel.itemValue.toxicMushroom.rawValue
                 ret = true
             }
             ret = false
-        } while ret == true
+        } while ret!
     }
     
     @objc func snakeWalk() {
         switch direction {
-        case moveDirection.up:
+        case UILabel.moveDirection.up.rawValue:
             //print("walk - up")
             let headOrgX = snakeArray[0].x
             let headOrgY = snakeArray[0].y
@@ -403,7 +338,7 @@ class EatingSnake: UIViewController {
             let tailNewX = snakeArray[snakeArray.count-2].x
             let tailNewY = snakeArray[snakeArray.count-2].y
             snakeBodyMove(headOrg: (headOrgX, headOrgY), headNew: (headNewX, headNewY), tailOrg: (tailOrgX, tailOrgY), tailNew: (tailNewX, tailNewY))
-        case moveDirection.down:
+        case UILabel.moveDirection.down.rawValue:
             //print("walk - down")
             let headOrgX = snakeArray[0].x
             let headOrgY = snakeArray[0].y
@@ -417,7 +352,7 @@ class EatingSnake: UIViewController {
             let tailNewX = snakeArray[snakeArray.count-2].x
             let tailNewY = snakeArray[snakeArray.count-2].y
             snakeBodyMove(headOrg: (headOrgX, headOrgY), headNew: (headNewX, headNewY), tailOrg: (tailOrgX, tailOrgY), tailNew: (tailNewX, tailNewY))
-        case moveDirection.left:
+        case UILabel.moveDirection.left.rawValue:
             //print("walk - left")
             let headOrgX = snakeArray[0].x
             let headOrgY = snakeArray[0].y
@@ -431,7 +366,7 @@ class EatingSnake: UIViewController {
             let tailNewX = snakeArray[snakeArray.count-2].x
             let tailNewY = snakeArray[snakeArray.count-2].y
             snakeBodyMove(headOrg: (headOrgX, headOrgY), headNew: (headNewX, headNewY), tailOrg: (tailOrgX, tailOrgY), tailNew: (tailNewX, tailNewY))
-        case moveDirection.right:
+        case UILabel.moveDirection.right.rawValue:
             //print("walk - right")
             let headOrgX = snakeArray[0].x
             let headOrgY = snakeArray[0].y
@@ -445,78 +380,40 @@ class EatingSnake: UIViewController {
             let tailNewX = snakeArray[snakeArray.count-2].x
             let tailNewY = snakeArray[snakeArray.count-2].y
             snakeBodyMove(headOrg: (headOrgX, headOrgY), headNew: (headNewX, headNewY), tailOrg: (tailOrgX, tailOrgY), tailNew: (tailNewX, tailNewY))
+        default:
+            break
         }
         isSnakeMove = true
     }
     
     func snakeBodyMove(headOrg: (x: Int, y: Int), headNew: (x: Int, y: Int), tailOrg:  (x: Int, y: Int), tailNew:  (x: Int, y: Int)) {
         var isRemoveTail: Bool = true
-        
-        if fast > 0 {
-            fast -= 1
-        }
-        if fast == 0 {
-            setTimer(level: level)
-        }
-        
-        if sick > 0 {
-            sick -= 1
-        }
 
         //head move
-        switch direction.rawValue {
-        case moveDirection.up.rawValue:
-            if sick > 0 {
-                pixel[headNew.x][headNew.y].imageColorInvert(name: item.snakeHeadUp.rawValue)
-            } else if fast > 0 {
-                pixel[headNew.x][headNew.y].imageFalseColor(name: item.snakeHeadUp.rawValue)
-            } else {
-                pixel[headNew.x][headNew.y].image(name: item.snakeHeadUp.rawValue)
+        //check status
+        pixel[headOrg.x][headOrg.y].status = UILabel.status.normal.rawValue
+        if sick > 0 {
+            pixel[headNew.x][headNew.y].status = UILabel.status.sick.rawValue
+            sick -= 1
+        } else if fast > 0 {
+            pixel[headNew.x][headNew.y].status = UILabel.status.fast.rawValue
+            fast -= 1
+            if fast == 0 {
+                setTimer(level: level)
             }
-        case moveDirection.left.rawValue:
-            if sick > 0 {
-                pixel[headNew.x][headNew.y].imageColorInvert(name: item.snakeHeadLeft.rawValue)
-            } else if fast > 0 {
-                pixel[headNew.x][headNew.y].imageFalseColor(name: item.snakeHeadLeft.rawValue)
-            } else {
-                pixel[headNew.x][headNew.y].image(name: item.snakeHeadLeft.rawValue)
-            }
-        case moveDirection.down.rawValue:
-            if sick > 0 {
-                pixel[headNew.x][headNew.y].imageColorInvert(name: item.snakeHeadDown.rawValue)
-            } else if fast > 0 {
-                pixel[headNew.x][headNew.y].imageFalseColor(name: item.snakeHeadDown.rawValue)
-            } else {
-                pixel[headNew.x][headNew.y].image(name: item.snakeHeadDown.rawValue)
-            }
-        case moveDirection.right.rawValue:
-            if sick > 0 {
-                pixel[headNew.x][headNew.y].imageColorInvert(name: item.snakeHeadRight.rawValue)
-            } else if fast > 0 {
-                pixel[headNew.x][headNew.y].imageFalseColor(name: item.snakeHeadRight.rawValue)
-            } else {
-                pixel[headNew.x][headNew.y].image(name: item.snakeHeadRight.rawValue)
-            }
-        default:
-            if sick > 0 {
-                pixel[headNew.x][headNew.y].imageColorInvert(name: item.snakeHeadUp.rawValue)
-            } else if fast > 0 {
-                pixel[headNew.x][headNew.y].imageFalseColor(name: item.snakeHeadUp.rawValue)
-            } else {
-                pixel[headNew.x][headNew.y].image(name: item.snakeHeadUp.rawValue)
-            }
+        } else {
+            pixel[headNew.x][headNew.y].status = UILabel.status.normal.rawValue
         }
         //judegement head eat food or body
-        if pixelValue[headNew.x][headNew.y] == itemValue.food.rawValue {
+        if pixel[headNew.x][headNew.y].value == UILabel.itemValue.food.rawValue {
             //eat food (head = food)
             voiceEat.play()
             print("eat food")
-            score += 10
             level += 1
-            scoreLabel.text = "Score: " + String(score) + ", Lv: " + String(level)
+            score += 10
             isRemoveTail = false
             setTimer(level: level)
-        } else if pixelValue[headNew.x][headNew.y] == itemValue.toxicMushroom.rawValue {
+        } else if pixel[headNew.x][headNew.y].value == UILabel.itemValue.toxicMushroom.rawValue {
             //eat Toxic Mushroom (head = Toxic Mushroom)
             voiceEat.play()
             print("eat Toxic Mushroom")
@@ -527,9 +424,8 @@ class EatingSnake: UIViewController {
             }
             fast = 10
             fastLevel = level
-            scoreLabel.text = "Score: " + String(score) + ", Lv: " + String(level)
             setTimer(level: level + 20)
-        } else if pixelValue[headNew.x][headNew.y] == itemValue.pufferFish.rawValue {
+        } else if pixel[headNew.x][headNew.y].value == UILabel.itemValue.pufferFish.rawValue {
             //eat Puffer Fish (head = Puffer Fish)
             voiceEat.play()
             print("eat Puffer Fish")
@@ -540,73 +436,27 @@ class EatingSnake: UIViewController {
             }
             sick = 10
             sickLevel = level
-            scoreLabel.text = "Score: " + String(score) + ", Lv: " + String(level)
-        } else if Int(pixelValue[headNew.x][headNew.y]/10) == itemValue.snakeBody.rawValue/10 || Int(pixelValue[headNew.x][headNew.y]/10) == itemValue.snakeTail.rawValue/10 {
+        } else if pixel[headNew.x][headNew.y].value.hundreds == UILabel.itemValue.snakeBody.rawValue || pixel[headNew.x][headNew.y].value.hundreds == UILabel.itemValue.snakeTail.rawValue {
             //eat body (die...)
             voiceDie.play()
             print("eat body")
             timer.fireDate = NSDate.distantFuture
             reStartAlarm()
         }
-        pixelValue[headNew.x][headNew.y] = itemValue.snakeHead.rawValue + direction.rawValue
+        pixel[headNew.x][headNew.y].value = UILabel.itemValue.snakeHead.rawValue + direction
         snakeArray.insert(.init(x: headNew.x, y: headNew.y), at: 0)
 
         //Body move
-        switch pixelValue[headOrg.x][headOrg.y]%10 {
-        case moveDirection.up.rawValue:
-            if direction == moveDirection.up {
-                pixel[headOrg.x][headOrg.y].image(name: item.snakeBodyUp.rawValue)
-            } else if direction == moveDirection.left {
-                pixel[headOrg.x][headOrg.y].image(name: item.snakeBodyUpLeft.rawValue)
-            } else if direction == moveDirection.right {
-                pixel[headOrg.x][headOrg.y].image(name: item.snakeBodyUpRight.rawValue)
-            }
-        case moveDirection.left.rawValue:
-            if direction == moveDirection.left {
-                pixel[headOrg.x][headOrg.y].image(name: item.snakeBodyLeft.rawValue)
-            } else if direction == moveDirection.up {
-                pixel[headOrg.x][headOrg.y].image(name: item.snakeBodyLeftUp.rawValue)
-            } else if direction == moveDirection.down {
-                pixel[headOrg.x][headOrg.y].image(name: item.snakeBodyLeftDown.rawValue)
-            }
-        case moveDirection.down.rawValue:
-            if direction == moveDirection.down {
-                pixel[headOrg.x][headOrg.y].image(name: item.snakeBodyDown.rawValue)
-            } else if direction == moveDirection.left {
-                pixel[headOrg.x][headOrg.y].image(name: item.snakeBodyDownLeft.rawValue)
-            } else if direction == moveDirection.right {
-                pixel[headOrg.x][headOrg.y].image(name: item.snakeBodyDownRight.rawValue)
-            }
-        case moveDirection.right.rawValue:
-            if direction == moveDirection.right {
-                pixel[headOrg.x][headOrg.y].image(name: item.snakeBodyRight.rawValue)
-            } else if direction == moveDirection.up {
-                pixel[headOrg.x][headOrg.y].image(name: item.snakeBodyRightUp.rawValue)
-            } else if direction == moveDirection.down {
-                pixel[headOrg.x][headOrg.y].image(name: item.snakeBodyRightDown.rawValue)
-            }
-        default:
-            pixel[headOrg.x][headOrg.y].image(name: item.snakeBodyUp.rawValue)
+        pixel[headOrg.x][headOrg.y].value = UILabel.itemValue.snakeBody.rawValue + direction
+        if lastDirection != direction  {
+            pixel[headOrg.x][headOrg.y].value += lastDirection * 10
+            lastDirection = direction
         }
-        pixelValue[headOrg.x][headOrg.y] = itemValue.snakeBody.rawValue + direction.rawValue
 
         //tail move
         if isRemoveTail {
-            switch pixelValue[tailNew.x][tailNew.y]%10 {
-            case moveDirection.up.rawValue:
-                pixel[tailNew.x][tailNew.y].image(name: item.snakeTailUp.rawValue)
-            case moveDirection.left.rawValue:
-                pixel[tailNew.x][tailNew.y].image(name: item.snakeTailLeft.rawValue)
-            case moveDirection.down.rawValue:
-                pixel[tailNew.x][tailNew.y].image(name: item.snakeTailDown.rawValue)
-            case moveDirection.right.rawValue:
-                pixel[tailNew.x][tailNew.y].image(name: item.snakeTailRight.rawValue)
-            default:
-                pixel[tailNew.x][tailNew.y].image(name: item.snakeTailUp.rawValue)
-            }
-            pixelValue[tailNew.x][tailNew.y] = itemValue.snakeTail.rawValue + pixelValue[tailNew.x][tailNew.y]%10
-            pixel[tailOrg.x][tailOrg.y].image(name: "none")
-            pixelValue[tailOrg.x][tailOrg.y] = itemValue.none.rawValue
+            pixel[tailNew.x][tailNew.y].value = UILabel.itemValue.snakeTail.rawValue + pixel[tailNew.x][tailNew.y].value.units
+            pixel[tailOrg.x][tailOrg.y].value = UILabel.itemValue.none.rawValue
             snakeArray.removeLast()
         } else {
             isRemoveTail = true
@@ -617,13 +467,17 @@ class EatingSnake: UIViewController {
         var hadMushroom: Bool = false
         var hadFish: Bool = false
         for i in 0...14 {
-            if pixelValue[i].contains(where: { $0 == itemValue.food.rawValue }) {
+            var tempPixelArray = [Int]()
+            for j in 0...14 {
+                tempPixelArray.append(pixel[i][j].value)
+            }
+            if tempPixelArray.contains(where: { $0 == UILabel.itemValue.food.rawValue }) {
                 hadFood = true
             }
-            if pixelValue[i].contains(where: { $0 == itemValue.toxicMushroom.rawValue }) {
+            if tempPixelArray.contains(where: { $0 == UILabel.itemValue.toxicMushroom.rawValue }) {
                 hadMushroom = true
             }
-            if pixelValue[i].contains(where: { $0 == itemValue.pufferFish.rawValue }) {
+            if tempPixelArray.contains(where: { $0 == UILabel.itemValue.pufferFish.rawValue }) {
                 hadFish = true
             }
         }
@@ -639,18 +493,150 @@ class EatingSnake: UIViewController {
     }
     
     func reStartGame() {
-        score = 0
         level = 1
-        scoreLabel.text = "Score: " + String(score) + ", Lv: " + String(level)
+        score = 0
         pixelReset()
-        direction = moveDirection.left
+        direction = UILabel.moveDirection.left.rawValue
         setTimer(level: level)
     }
 
     
 }
 
+extension Int {
+    var units: Int {
+        get {
+            return self % 10
+        }
+    }
+    
+    var tens: Int {
+        get {
+            return self / 10 % 10 * 10
+        }
+    }
+
+    var hundreds: Int {
+        get {
+            return self / 100 % 10 * 100
+        }
+    }
+}
+
 extension UILabel {
+    enum item: String {
+        case toxicMushroom = "🍄"
+        case pufferFish = "🐡"
+        case food = "🍖"
+        case none = " "
+    }
+
+    enum moveDirection: Int {
+        case up = 1
+        case left = 2
+        case down = 3
+        case right = 4
+    }
+
+    enum status: Int {
+        case normal = 0
+        case sick = 1
+        case fast = 2
+    }
+    
+    //佰位數 = 蛇的部位，十位數 = 原來方向，個位數 = 目前方向
+    enum itemValue: Int {
+        case snakeHead = 500
+        case snakeBody = 400
+        case snakeTail = 300
+        
+        case toxicMushroom = 77
+        case pufferFish = 88
+        case food = 99
+        case none = 0
+    }
+
+    private struct cell {
+        static var value: Int = 0
+        static var status: Int = 0
+    }
+
+    var value: Int {
+        get {
+            return objc_getAssociatedObject(self, &cell.value) as! Int
+        }
+        set {
+            objc_setAssociatedObject(self, &cell.value, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+            
+            if newValue == itemValue.none.rawValue {
+                self.text = UILabel.item.none.rawValue
+            } else if newValue == itemValue.food.rawValue {
+                self.text = UILabel.item.food.rawValue
+            } else if newValue == itemValue.toxicMushroom.rawValue {
+                self.text = UILabel.item.toxicMushroom.rawValue
+            } else if newValue == itemValue.pufferFish.rawValue {
+                self.text = UILabel.item.pufferFish.rawValue
+            } else {
+                var imageName: String = ""
+
+                switch newValue.hundreds {
+                case itemValue.snakeHead.rawValue:
+                    imageName = "snakeHead"
+                case itemValue.snakeBody.rawValue:
+                    imageName = "snakeBody"
+                case itemValue.snakeTail.rawValue:
+                    imageName = "snakeTail"
+                default:
+                    break
+                }
+                
+                switch newValue.tens / 10 {
+                case moveDirection.up.rawValue:
+                    imageName += "Up"
+                case moveDirection.left.rawValue:
+                    imageName += "Left"
+                case moveDirection.down.rawValue:
+                    imageName += "Down"
+                case moveDirection.right.rawValue:
+                    imageName += "Right"
+                default:
+                    break
+                }
+
+                switch newValue.units {
+                case moveDirection.up.rawValue:
+                    imageName += "Up"
+                case moveDirection.left.rawValue:
+                    imageName += "Left"
+                case moveDirection.down.rawValue:
+                    imageName += "Down"
+                case moveDirection.right.rawValue:
+                    imageName += "Right"
+                default:
+                    break
+                }
+                
+                if self.status == status.sick.rawValue && newValue.hundreds == itemValue.snakeHead.rawValue {
+                    self.imageColorInvert(name: imageName)
+                } else if self.status == status.fast.rawValue && newValue.hundreds == itemValue.snakeHead.rawValue {
+                    self.imageFalseColor(name: imageName)
+                } else {
+                    self.image(name: imageName)
+                }
+                print("Debug:", newValue.hundreds, newValue.tens, newValue.units, imageName)
+            }
+        }
+    }
+    
+    var status: Int {
+        get {
+            return objc_getAssociatedObject(self, &cell.status) as! Int
+        }
+        set {
+            objc_setAssociatedObject(self, &cell.status, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+        }
+    }
+
     func image(name: String) {
         let attributedString = NSMutableAttributedString(string: " ")
         let textAttachment = NSTextAttachment()
@@ -713,8 +699,6 @@ extension UIView {
         self.addSubview(imageViewBackground)
         self.sendSubview(toBack: imageViewBackground)
     }
-
-
 }
 
 
